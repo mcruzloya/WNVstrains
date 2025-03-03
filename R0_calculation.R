@@ -61,14 +61,15 @@ plot_curves <- function(temps, curves, xlim=c(0, 50), ylim=c(0, 1)) {
 temps <- seq(0, 50, 0.05) # Test with small vector first to debug.
 
 ## Load data for biting rate
-load("./shocket_fits/jagsout_a_Cpip_inf.Rdata")
-a.Cpip.out.inf
+#load("./shocket_fits/jagsout_a_Cpip_inf.Rdata")
+#a.Cpip.out.inf$BUGSoutput
 
 # Only keep chains for TPC model parameters to save memory.
-a.chains <- MCMCchains(a.Cpip.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
+#a.chains <- MCMCchains(a.Cpip.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
+a.chains <- readRDS("./shocket_fits/a_Cpip_shocket.RDS")
 
 # Remove data to save memory
-rm(a.Cpip.out.inf)
+#rm(a.Cpip.out.inf)
 
 # Calculate trait values for each sample at all temperatures.
 a.curves <-  apply(a.chains, 1, function(x) briere(temps, x[1], x[2], x[3]))
@@ -106,64 +107,66 @@ for(st in 1:4) {
 plot_curves(temps, bc.rec.curves[[1]], ylim=c(0,1))
 
 ## Lifespan
-load("./shocket_fits/jagsout_lf_Cpip_inf.Rdata")
-lf.Cpip.out.inf
+#load("./shocket_fits/jagsout_lf_Cpip_inf.Rdata")
+#lf.Cpip.out.inf
 
-lf.chains <- MCMCchains(lf.Cpip.out.inf, params=c("cf.m", "cf.b"))
-rm(lf.Cpip.out.inf)
+#lf.chains <- MCMCchains(lf.Cpip.out.inf, params=c("cf.m", "cf.b"))
+#rm(lf.Cpip.out.inf)
+lf.chains <- readRDS("./shocket_fits/lf_Cpip_shocket.RDS")
 
 lf.curves <- apply(lf.chains, 1, function(x) linear_lim(temps, x[1], x[2]))
 
 plot_curves(temps, lf.curves, ylim=c(0, 100))
 
 ## Pathogen development rate
-load("./shocket_fits/jagsout_PDR_CpipWNV_inf.Rdata")
-PDR.CpipWNV.out.inf$BUGSoutput$summary
+#load("./shocket_fits/jagsout_PDR_CpipWNV_inf.Rdata")
+#PDR.CpipWNV.out.inf$BUGSoutput$summary
 
-PDR.chains <- MCMCchains(PDR.CpipWNV.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
-rm(PDR.CpipWNV.out.inf)
-
+#PDR.chains <- MCMCchains(PDR.CpipWNV.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
+#rm(PDR.CpipWNV.out.inf)
+PDR.chains <- readRDS("./shocket_fits/PDR_CpipWNV_shocket.RDS")
 PDR.curves <- apply(PDR.chains, 1, function(x) briere(temps, x[1], x[2], x[3]))
 
 plot_curves(temps, PDR.curves, ylim=c(0, 0.3))
 
 ## Fecundity
-load("./shocket_fits/jagsout_EFOC_Cpip_inf.Rdata")
-EFOC.Cpip.out.inf
-EFOC.chains <- MCMCchains(EFOC.Cpip.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
-
+#load("./shocket_fits/jagsout_EFOC_Cpip_inf.Rdata")
+#EFOC.Cpip.out.inf
+#EFOC.chains <- MCMCchains(EFOC.Cpip.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
+EFOC.chains <- readRDS("./shocket_fits/EFOC_Cpip_shocket.RDS")
 EFOC.curves <- apply(EFOC.chains, 1, function(x) quad(temps, x[1], x[2], x[3]))
-
 plot_curves(temps, EFOC.curves, ylim=c(0, 400))
-#plot_curves(temps, ER.alb.curves)
 
 
 ## Egg viability 
-load("./shocket_fits/jagsout_EV_Cpip_inf.Rdata")
-EV.chains <- MCMCchains(EV.Cpip.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
-EV.Cpip.out.inf$BUGSoutput$summary
-rm(EV.Cpip.out.inf)
-
+#load("./shocket_fits/jagsout_EV_Cpip_inf.Rdata")
+#EV.chains <- MCMCchains(EV.Cpip.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
+#EV.Cpip.out.inf$BUGSoutput$summary
+#rm(EV.Cpip.out.inf)
+EV.chains <- readRDS("./shocket_fits/EV_Cpip_shocket.RDS")
 EV.curves <- apply(EV.chains, 1, function(x) quad_lim(temps, x[1], x[2], x[3]))
+plot_curves(temps, EV.curves, ylim=c(0, 1))
+
 
 ## Larval survival
-load("./shocket_fits/jagsout_pLA_Cpip_inf.Rdata")
-pLA.Cpip.out.inf$BUGSoutput$summary
-pLA.chains <- MCMCchains(pLA.Cpip.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
-rm(pLA.Cpip.out.inf)
+#load("./shocket_fits/jagsout_pLA_Cpip_inf.Rdata")
+#pLA.Cpip.out.inf$BUGSoutput$summary
+#pLA.chains <- MCMCchains(pLA.Cpip.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
+#rm(pLA.Cpip.out.inf)
+pLA.chains <- readRDS("./shocket_fits/pLA_Cpip_shocket.RDS")
 
 pLA.curves <- apply(pLA.chains, 1, function(x) quad_lim(temps, x[1], x[2], x[3]))
-
-plot_curves(temps, pLA.curves)
+plot_curves(temps, pLA.curves, ylim=c(0, 1))
 
 ## Mosquito development rate
-load("./shocket_fits/jagsout_MDR_Cpip_inf.Rdata")
-MDR.Cpip.out.inf$BUGSoutput$summary
+#load("./shocket_fits/jagsout_MDR_Cpip_inf.Rdata")
+#MDR.Cpip.out.inf$BUGSoutput$summary
+#MDR.chains <- MCMCchains(MDR.Cpip.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
 
-MDR.chains <- MCMCchains(MDR.Cpip.out.inf, params=c("cf.T0", "cf.Tm", "cf.q"))
-
-MDR.chains
+MDR.chains <- readRDS("./shocket_fits/MDR_Cpip_shocket.RDS")
 MDR.curves <- apply(MDR.chains, 1, function(x) briere(temps, x[1], x[2], x[3]))
+plot_curves(temps, MDR.curves, ylim=c(0, 0.3))
+
 
 ## R0
 find_Topt <- function(temps, curves) {
